@@ -7,6 +7,7 @@ const url=process.env.NEXT_PUBLIC_SUPABASE_URL||"", key=process.env.NEXT_PUBLIC_
 let supabase:SupabaseClient|null=null; if(url&&key)supabase=createClient(url,key);
 export default function Home(){
  const [session,setSession]=useState<any>(null),[rows,setRows]=useState<Booking[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(""),[search,setSearch]=useState(""),[lang,setLang]=useState<"en"|"ta">("en"),[showForm,setShowForm]=useState(false);
+ const [selectedBooking,setSelectedBooking]=useState<Booking|null>(null);
  const [recoveryMode,setRecoveryMode]=useState(false),[newPassword,setNewPassword]=useState(""),[confirmPassword,setConfirmPassword]=useState("");
  const [form,setForm]=useState({customer_name:"",customer_phone:"",service_type:"Outstation",pickup:"",destination:"",pickup_at:"",passengers:1,customer_amount:0,vendor_cost:0}); const t=(en:string,ta:string)=>lang==="en"?en:ta;
  async function load(){if(!supabase){setError("Supabase configuration missing. Add the project URL and publishable key.");setLoading(false);return;}const {data:{session:s}}=await supabase.auth.getSession();setSession(s);if(!s){setLoading(false);return;}const {data,error:e}=await supabase.from("bookings").select("*").order("created_at",{ascending:false}).limit(100);if(e)setError(e.message);else setRows((data||[]) as Booking[]);setLoading(false);}

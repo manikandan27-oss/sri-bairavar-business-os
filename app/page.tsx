@@ -683,5 +683,207 @@ export default function Home() {
             <h1>{t("Business dashboard", "வணிக முகப்பு")}</h1>
           </div>
 
-          <button
+          
              
+            className="secondary"
+            onClick={() => setLang(lang === "en" ? "ta" : "en")}
+          >
+            <Languages size={17} />
+            {t("தமிழ்", "English")}
+          </button>
+        </header>
+
+        {error && <div className="notice">{error}</div>}
+
+        <div className="stats">
+          <article>
+            <span>{t("Total Bookings", "மொத்த முன்பதிவுகள்")}</span>
+            <strong>{rows.length}</strong>
+          </article>
+          <article>
+            <span>{t("Total Booking Value", "மொத்த முன்பதிவு மதிப்பு")}</span>
+            <strong>{money(total)}</strong>
+          </article>
+          <article>
+            <span>{t("Outstanding", "நிலுவை")}</span>
+            <strong>
+              {money(rows
+                .filter(r => r.payment_status !== "PAID")
+                .reduce((s, r) => s + Number(r.customer_amount || 0), 0))}
+            </strong>
+          </article>
+        </div>
+
+        <div className="section-head">
+          <h2>{t("Booking Register", "முன்பதிவு பட்டியல்")}</h2>
+          <button className="primary" onClick={() => setShowForm(true)}>
+            <Plus size={17} /> {t("New Booking", "புதிய முன்பதிவு")}
+          </button>
+        </div>
+
+        <div className="search-box">
+          <Search size={18} />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder={t("Search bookings...", "முன்பதிவுகளைத் தேடுங்கள்...")}
+          />
+        </div>
+
+        {loading ? (
+          <p className="muted">Loading bookings...</p>
+        ) : filtered.length === 0 ? (
+          <p className="muted">No bookings found.</p>
+        ) : (
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Customer</th>
+                  <th>Destination</th>
+                  <th>Amount</th>
+                  <th>Booking Status</th>
+                  <th>Payment</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map(r => (
+                  <tr
+                    key={r.id}
+                    onClick={() => openBooking(r)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <td>{r.booking_ref}</td>
+                    <td>{r.customer_name}</td>
+                    <td>{r.destination}</td>
+                    <td>{money(Number(r.customer_amount))}</td>
+                    <td>{r.booking_status}</td>
+                    <td>{r.payment_status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {showForm && (
+          <div className="modal stack">
+            <div className="section-head">
+              <h2>New Booking</h2>
+              <button
+                type="button"
+                className="close"
+                onClick={() => setShowForm(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <form className="stack" onSubmit={createBooking}>
+              <h3>Customer Details</h3>
+
+              <label>Customer Name
+                <input
+                  required
+                  value={form.customer_name}
+                  onChange={e => setForm({ ...form, customer_name: e.target.value })}
+                />
+              </label>
+
+              <label>Mobile Number
+                <input
+                  required
+                  value={form.customer_phone}
+                  onChange={e => setForm({ ...form, customer_phone: e.target.value })}
+                />
+              </label>
+
+              <h3>Journey Details</h3>
+
+              <label>Service Type
+                <select
+                  value={form.service_type}
+                  onChange={e => setForm({ ...form, service_type: e.target.value })}
+                >
+                  <option>Local</option>
+                  <option>Outstation</option>
+                  <option>Airport</option>
+                  <option>Tour Package</option>
+                  <option>Corporate</option>
+                </select>
+              </label>
+
+              <label>Pickup
+                <input
+                  required
+                  value={form.pickup}
+                  onChange={e => setForm({ ...form, pickup: e.target.value })}
+                />
+              </label>
+
+              <label>Destination
+                <input
+                  required
+                  value={form.destination}
+                  onChange={e => setForm({ ...form, destination: e.target.value })}
+                />
+              </label>
+
+              <label>Pickup Date and Time
+                <input
+                  required
+                  type="datetime-local"
+                  value={form.pickup_at}
+                  onChange={e => setForm({ ...form, pickup_at: e.target.value })}
+                />
+              </label>
+
+              <label>Passengers
+                <input
+                  required
+                  type="number"
+                  min="1"
+                  value={form.passengers}
+                  onChange={e => setForm({ ...form, passengers: Number(e.target.value) })}
+                />
+              </label>
+
+              <h3>Financial Details</h3>
+
+              <label>Customer Price (₹)
+                <input
+                  type="number"
+                  min="0"
+                  value={form.customer_amount}
+                  onChange={e => setForm({ ...form, customer_amount: Number(e.target.value) })}
+                />
+              </label>
+
+              <label>Vendor Cost (₹)
+                <input
+                  type="number"
+                  min="0"
+                  value={form.vendor_cost}
+                  onChange={e => setForm({ ...form, vendor_cost: Number(e.target.value) })}
+                />
+              </label>
+
+              <div className="actions">
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => setShowForm(false)}
+                >
+                  Cancel
+                </button>
+                <button className="primary">Save Booking</button>
+              </div>
+            </form>
+          </div>
+        )}
+      </section>
+    </main>
+  );
+        }
+

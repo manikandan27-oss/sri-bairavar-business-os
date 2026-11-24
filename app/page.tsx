@@ -192,6 +192,7 @@ export default function Home() {
       passengers: Number(form.passengers),
       customer_amount: Number(form.customer_amount),
       vendor_cost: Number(form.vendor_cost),
+      pickup_at: new Date(form.pickup_at).toISOString(),
       owner_id: user.id,
       booking_status: "NEW",
       payment_status: "UNPAID"
@@ -382,6 +383,7 @@ export default function Home() {
           </form>
 
           <button
+            type="button"
             className="link-btn"
             onClick={() => setLang(lang === "en" ? "ta" : "en")}
           >
@@ -403,6 +405,11 @@ export default function Home() {
     0
   );
 
+  const profit = rows.reduce(
+    (s, r) => s + Number(r.customer_amount || 0) - Number(r.vendor_cost || 0),
+    0
+  );
+
   if (selectedBooking) {
     const b = selectedBooking;
 
@@ -417,6 +424,7 @@ export default function Home() {
             </div>
 
             <button
+              type="button"
               className="secondary"
               onClick={() => {
                 setSelectedBooking(null);
@@ -570,7 +578,7 @@ export default function Home() {
                   Cancel
                 </button>
 
-                <button className="primary" disabled={savingBooking}>
+                <button type="submit" className="primary" disabled={savingBooking}>
                   <Save size={17} />
                   {savingBooking ? "Saving..." : "Save Changes"}
                 </button>
@@ -580,7 +588,7 @@ export default function Home() {
             <>
               <div className="section-head">
                 <h2>Booking Reference: {b.booking_ref}</h2>
-                <button className="primary" onClick={startEditing}>
+                <button type="button" className="primary" onClick={startEditing}>
                   <Pencil size={17} /> Edit Booking
                 </button>
               </div>
@@ -641,6 +649,7 @@ export default function Home() {
               </div>
 
               <button
+                type="button"
                 className="secondary"
                 onClick={() => setSelectedBooking(null)}
               >
@@ -671,18 +680,5 @@ export default function Home() {
           <a><IndianRupee size={18} />{t("Payments", "பணம்")}</a>
         </nav>
 
-        <button className="logout" onClick={logout}>
-          <LogOut size={16} /> Sign out
-        </button>
-      </aside>
-
-      <section className="main">
-        <header className="topbar">
-          <div>
-            <p className="eyebrow">OWNER CONTROL PANEL</p>
-            <h1>{t("Business dashboard", "வணிக முகப்பு")}</h1>
-          </div>
-
-          <button
-             
-
+        <button type="button" className="logout" onClick={logout}>
+          <Log
